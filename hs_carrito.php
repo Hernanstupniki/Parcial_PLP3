@@ -108,7 +108,20 @@ $carrito_count = hs_count_items();
 </head>
 <body>
 <header class="hs-header">
-  <a href="hs_menu.php" class="hs-btn-sec">← Seguir comprando</a>
+  <div class="hs-nav-wrap">
+    <button class="hs-burger" id="hs_burger" aria-label="Abrir menú" aria-controls="hs_nav" aria-expanded="false">☰</button>
+    <a href="hs_menu.php" style="display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none">
+      <img src="hs_assets/hs_logo.png" alt="FoodExpress" class="hs-logo">
+      <strong>FoodExpress</strong>
+    </a>
+  </div>
+
+  <nav class="hs-nav" id="hs_nav">
+    <a href="hs_menu.php" class="<?= (basename($_SERVER['PHP_SELF'])==='hs_menu.php')?'hs-active':'';?>">Menú</a>
+    <a href="hs_carrito.php" class="<?= (basename($_SERVER['PHP_SELF'])==='hs_carrito.php')?'hs-active':'';?>">Carrito</a>
+    <a href="hs_checkout.php" class="<?= (basename($_SERVER['PHP_SELF'])==='hs_checkout.php')?'hs-active':'';?>">Checkout</a>
+  </nav>
+
   <a class="hs-cart-link" href="hs_carrito.php">🛒 Carrito <span id="hs_cart_badge"><?= (int)$carrito_count ?></span></a>
 </header>
 

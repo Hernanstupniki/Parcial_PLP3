@@ -1,12 +1,13 @@
 /**
- * FoodExpress – Interactividad Nivel 2
- * - Agregar/Quitar/Actualizar productos sin recargar (fetch + JSON)
- * - Recalcular subtotales y total en vivo
- * - Validar cantidades (min=0, max=99)
- * - Actualizar contador de ítems (badge) en el header
+ * FoodExpress – Interactividad Niveles 2 y 4
+ * - Carrito dinámico sin recarga (add/update/clear con fetch + JSON)
+ * - Subtotales/total en vivo y validación de cantidades (0–99)
+ * - Badge del carrito en el header
+ * - Menú hamburguesa responsive + helpers de loading (aria-busy / overlay)
  */
 const HS_MAX_QTY = 99;
 
+/** ---------- Carrito (Nivel 2) ---------- */
 function hs_setBadge(count) {
   const badge = document.getElementById('hs_cart_badge');
   if (badge && typeof count === 'number') badge.textContent = count;
@@ -51,10 +52,9 @@ async function hs_actualizarCantidad(idProducto, cant) {
     const data = await res.json();
     if (!data?.ok) throw new Error('No se pudo actualizar');
 
-    // Actualiza DOM: fila, totales y badge
+    // Actualiza DOM
     hs_setBadge(data.count);
 
-    // Si eliminaron el item, quitamos la fila
     if (cantidad === 0) {
       const row = document.querySelector(`[data-hs-row="${idProducto}"]`);
       if (row) row.remove();
@@ -65,11 +65,9 @@ async function hs_actualizarCantidad(idProducto, cant) {
       if (qtyInput) qtyInput.value = String(data.item_qty);
     }
 
-    // Total general
     const totalEl = document.getElementById('hs_total_general');
     if (totalEl) totalEl.textContent = data.total_fmt;
 
-    // Si ya no hay items, recargar vista mínima (o mostrás un vacío)
     if (data.count === 0) location.href = 'hs_carrito.php';
   } catch (e) {
     alert('No se pudo actualizar el carrito.');
@@ -91,4 +89,33 @@ async function hs_vaciarCarrito() {
     alert('No se pudo vaciar el carrito.');
     console.error(e);
   }
+}
+
+/** ---------- UX helpers (Nivel 4) ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  const burger = document.getElementById('hs_burger');
+  const nav = document.getElementById('hs_nav');
+  if (burger && nav) {
+    burger.addEventListener('click', () => {
+      const open = nav.classList.toggle('is-open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+});
+
+function hs_btnLoading(btn, state = true){
+  if (!btn) return;
+  btn.setAttribute('aria-busy', state ? 'true' : 'false');
+  btn.disabled = !!state;
+}
+
+function hs_showLoader(show = true){
+  let el = document.getElementById('hs_global_loader');
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'hs_global_loader';
+    el.innerHTML = '<div class="hs-spinner" role="status" aria-live="polite" aria-label="Cargando"></div>';
+    document.body.appendChild(el);
+  }
+  el.classList.toggle('is-active', !!show);
 }
